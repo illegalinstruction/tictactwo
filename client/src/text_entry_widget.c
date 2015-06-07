@@ -137,7 +137,7 @@ void TEWI_draw(void)
         0,
         TEXT_ENTRY_WIDGET_WIDGET_TEXT_SIZE,
         0,
-        tewi_priv_string);
+        "%s",tewi_priv_string);
 
     // a visual cursor
     if (tewi_char_index < TEXT_ENTRY_WIDGET_STRING_LENGTH)
