@@ -47,6 +47,8 @@ static BACKGROUND_STAR  bkgrnd_stars[BACKGROUND_NUM_STARS];
 /*! \brief Helper function to animate the 'stars' in the background. */
 static void             bkgrnd_star_tick(void);
 
+void BKGRND_draw_pass(void);
+
 void bkgrnd_unload(void);
 
 /*! \} */
@@ -113,33 +115,13 @@ static void bkgrnd_star_tick(void)
 }
 
 /****************************************************************************************************************/
-/*! \brief Animate the stars in the background.
+/*! \brief Paint the tunnel and the 'x' and 'o' sprites.
  */
-void BKGRND_draw(void)
+void BKGRND_draw_pass(void)
 {
-    COMMON_to_perspective();
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_FOG);
-
-    int r_tmp;
-    int g_tmp;
-    int b_tmp;
-
-    glDisable(GL_ALPHA_TEST);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
     glColor3ub( (int)((sinf(bkgrnd_anim_clock / 65.0f) * 127) + 128),
                 (int)((sinf(bkgrnd_anim_clock / 74.0f) * 127) + 128),
                 (int)((sinf(bkgrnd_anim_clock / 59.0f) * 127) + 128));
-
-    glLoadIdentity();
-
-    COMMON_look_at( sinf(bkgrnd_anim_clock / 98.0f) * 10.0f,
-                    sinf(bkgrnd_anim_clock / 109.1f) * 3.0f,
-                    (sinf(bkgrnd_anim_clock / 176.3f) * 2.0f) + (sinf(bkgrnd_anim_clock / 59.3f) * 1.4f) ,
-                    0, 0, 0);
 
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
@@ -205,9 +187,54 @@ void BKGRND_draw(void)
             break;
         }
     }
+}
+
+/****************************************************************************************************************/
+/*! \brief Animate the stars in the background.
+ */
+void BKGRND_draw(void)
+{
+    COMMON_to_perspective();
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_FOG);
+
+    int r_tmp;
+    int g_tmp;
+    int b_tmp;
+
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+
+
+
+    glLoadIdentity();
+
+    COMMON_look_at( sinf(bkgrnd_anim_clock / 98.0f) * 10.0f,
+                    sinf(bkgrnd_anim_clock / 109.1f) * 3.0f,
+                    (sinf(bkgrnd_anim_clock / 176.3f) * 2.0f) + (sinf(bkgrnd_anim_clock / 59.3f) * 1.4f) ,
+                    0, 0, 0);
+
+    glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
+    BKGRND_draw_pass();
+
+
+    glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
+    glScalef(1.01, 1.01, 1.01);
+    BKGRND_draw_pass();
+
+    glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
+    glScalef(1.01, 1.01, 1.01);
+    BKGRND_draw_pass();
+
+
+
+    glColorMask(GL_TRUE , GL_TRUE, GL_TRUE , GL_TRUE);
 
     glDisable(GL_BLEND);
     glColor3ub(255, 255, 255);
+
 
     COMMON_to_ortho();
 }
