@@ -203,6 +203,7 @@ void COMMON_set_bgm(int track)
         // no - null out duh and player
         al_stop_duh(common_duhplyr);
         common_duhplyr = NULL;
+        common_bgm_fade_done = TRUE; // not technically, but we _are_ silent at this point...
     }
 }
 
