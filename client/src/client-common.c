@@ -786,3 +786,47 @@ void COMMON_shutdown(void)
     glDeleteTextures(1, &common_gamefont);
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
 }
+
+/**********************************************************************************************/
+/*! \brief Loads a text file into a null-terminated array of characters and returns a
+ * pointer to it.
+ * \warning The <b>caller</b> is responsible for calling free() on the returned block.
+ * \note Will return NULL if the file couldn't be read or stored for any reason.
+ */
+char * COMMON_load_file_to_char_array(const char *filename)
+{
+    FILE *in;
+
+    // Trivial case: does this file even exist?
+    if (!exists(filename))
+    {
+        // No - nothing to do.
+        return NULL;
+    }
+
+    in = fopen(filename,"rb");
+
+    // See how long it is...
+    fseek(in, SEEK_END, SEEK_SET);
+    long int file_length = ftell(in);
+
+    // Try allocating space for it.
+    char * ret = (char *)malloc(file_length + 1);
+    if (ret == NULL)
+    {
+        // Couldn't be done - clean up and go home...
+        DUH_WHERE_AM_I(" failed to allocate a big enough block to store %s!" ,filename);
+        fclose(in);
+        return NULL;
+    }
+
+    // read the file into the array
+    fseek(in, 0, SEEK_SET);
+    fread(ret, 1, file_length, in);
+    fclose(in);
+
+    // force a trailing NULL, just in case...
+    ret[file_length] = 0;
+
+    return ret;
+}

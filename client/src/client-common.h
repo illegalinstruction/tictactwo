@@ -161,6 +161,7 @@
     BOOL    COMMON_send(void *data, uint16_t length);
     BOOL    COMMON_recv(void *data, uint16_t length);
     void    COMMON_disconnect(void);
+    char    *COMMON_load_file_to_char_array(const char *filename);
 
 
 #endif
