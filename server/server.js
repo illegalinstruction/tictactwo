@@ -25,11 +25,11 @@ const PLYRMNGR_init_database = function()
 		(error) => {if (error) console.warn(error.message); process.exit(1);});
 
 	// create player table
-	query = ("CREATE TABLE IF NOT EXISTS players(\
-		id INTEGER PRIMARY KEY,\
-		nick VARCHAR(32), pass VARCHAR(32),
-		wins INTEGER, losses INTEGER,
-		logged_in INTEGER, in_match INTEGER);");
+	query = "CREATE TABLE IF NOT EXISTS players( \
+		id INTEGER PRIMARY KEY, \
+		nick VARCHAR(32), pass VARCHAR(32), \
+		wins INTEGER, losses INTEGER, \
+		logged_in INTEGER, in_match INTEGER);";
 
 	db.run(query);
 
