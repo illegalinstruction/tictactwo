@@ -1,17 +1,52 @@
-const 	http = require("http");
-const 	host = 'localhost';
-const 	port = 8000;
+const	sqlite3 = require("sqlite3").verbose();
+const 	http 	= require("http");
+
+//----------------------------------------------------
+
+var	was_db_inited = false;
+
+var	active_players 		= 0;
+const 	max_active_players 	= 64;
+
+var 	db	= null;
+var 	query	= "";
+const 	host 	= "localhost";
+const 	port 	= 5555;
+
+//----------------------------------------------------
+
+const PLYRMNGR_init_database = function()
+{
+	if (was_db_inited) return;
+
+	// open saved stats
+	db = new sqlite3.Database("./player_data.db",
+		sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE | sqlite3.OPEN_FULLMUTEX,
+		(error) => {if (error) console.warn(error.message); process.exit(1);});
+
+	// create player table
+	query = ("CREATE TABLE IF NOT EXISTS players(\
+		id INTEGER PRIMARY KEY,\
+		nick VARCHAR(32), pass VARCHAR(32),
+		wins INTEGER, losses INTEGER,
+		logged_in INTEGER, in_match INTEGER);");
+
+	db.run(query);
+
+	was_db_inited = true;
+
+	// TODO: error checking
+}
 
 //----------------------------------------------------
 
 const PLYRMNGR_handle_new_connect = function(request, response)
 {
 	console.log("PLYRMNGR_handle_new_connect");
+	if (!was_db_inited) PLYRMNGR_init_database();
 
 	const nick = request.headers["nick"];
 	const pass = request.headers["pass"];
-
-	console.log(nick);
 
 	// did user supply credentials?
 	if ((nick == null) || (pass == null) || (nick == "") || (pass == ""))
@@ -19,7 +54,21 @@ const PLYRMNGR_handle_new_connect = function(request, response)
 		// no - login failure
 		response.writeHead(401);
 		response.end("login credentials missing from request");
-	} 
+	}
+
+	// does this player already exist in the DB?
+	query = ("SELECT nick, pass FROM players WHERE nick LIKE '" + nick + ";");
+	db.all(query,[],(error, rows) => 
+		{
+			if (error)
+			{
+				console.log(error);
+			};
+			rows.forEach((row) => {
+    				console.log(row.nick);
+  			});				
+		});
+	
 
 	// check if app id, player name, password are okay
 
